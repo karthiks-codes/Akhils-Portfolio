@@ -4,9 +4,10 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import { ArrowUpRight, Command as CommandIcon, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { CommandMenu } from "@/components/layout/command-menu";
+import { dispatchLogoSecret } from "@/components/layout/easter-eggs";
 import { assets } from "@/lib/assets/manifest";
 
 const links = [
@@ -21,6 +22,17 @@ export function SiteNav() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
+  const logoClicks = useRef<number[]>([]);
+
+  function handleLogoClick() {
+    const now = Date.now();
+    logoClicks.current = [...logoClicks.current.filter((time) => now - time < 2600), now];
+    if (logoClicks.current.length === 5) {
+      logoClicks.current = [];
+      dispatchLogoSecret();
+    }
+    setMobileOpen(false);
+  }
 
   return (
     <Tooltip.Provider delayDuration={400}>
@@ -31,7 +43,7 @@ export function SiteNav() {
         >
           <Link
             href="/"
-            onClick={() => setMobileOpen(false)}
+            onClick={handleLogoClick}
             className="flex h-10 items-center gap-2.5 rounded-xl px-2 font-semibold tracking-[-0.02em]"
           >
             <span className="grid size-7 place-items-center rounded-full border border-accent/30 bg-accent/10 font-mono text-[0.7rem] text-accent">

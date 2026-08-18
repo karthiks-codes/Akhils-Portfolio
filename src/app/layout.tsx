@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import type { ReactNode } from "react";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
+import { EasterEggs } from "@/components/layout/easter-eggs";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteNav } from "@/components/layout/site-nav";
 import { site } from "@/content/site";
@@ -63,6 +66,9 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <SiteNav />
         <main id="main-content">{children}</main>
         <SiteFooter />
+        <EasterEggs />
+        <Analytics />
+        <SpeedInsights sampleRate={0.5} />
         <Script id="person-json-ld" type="application/ld+json" strategy="beforeInteractive">
           {JSON.stringify(jsonLd)}
         </Script>

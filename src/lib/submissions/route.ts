@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import type { ZodType } from "zod";
 
@@ -18,21 +19,27 @@ export async function handleSubmissionRoute(
   type: "contact" | "suggestion",
   schema: ZodType<ContactInput> | ZodType<SuggestionInput>,
 ) {
+  const requestId = request.headers.get("x-request-id")?.slice(0, 128) || randomUUID();
+  const response = (body: object, init?: ResponseInit) => {
+    const headers = new Headers(init?.headers);
+    headers.set("X-Request-Id", requestId);
+    return NextResponse.json(body, { ...init, headers });
+  };
   const contentLength = Number(request.headers.get("content-length") || 0);
   if (contentLength > MAX_REQUEST_BYTES) {
-    return NextResponse.json({ message: "That message is too large." }, { status: 413 });
+    return response({ message: "That message is too large." }, { status: 413 });
   }
 
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ message: "The form data could not be read." }, { status: 400 });
+    return response({ message: "The form data could not be read." }, { status: 400 });
   }
 
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
+    return response(
       {
         message: "Please check the highlighted details and try again.",
         fields: parsed.error.flatten().fieldErrors,
@@ -43,7 +50,7 @@ export async function handleSubmissionRoute(
 
   const config = getSubmissionConfig();
   if (!config.ok) {
-    return NextResponse.json({ message: config.message }, { status: 503 });
+    return response({ message: config.message }, { status: 503 });
   }
 
   const remoteAddress = clientAddress(request.headers);
@@ -54,15 +61,16 @@ export async function handleSubmissionRoute(
       {
         remoteAddress,
         abuseIdentifier: abuseIdentifier(remoteAddress, config.env.SUBMISSION_HASH_SALT),
+        requestId,
       },
       runtimeSubmissionAdapters(config.env),
     );
-    return NextResponse.json({ ok: true, id: result.id });
+    return response({ ok: true, id: result.id });
   } catch (error) {
     if (error instanceof SubmissionError) {
       const headers = error.retryAfter ? { "Retry-After": String(error.retryAfter) } : undefined;
-      return NextResponse.json({ message: error.message }, { status: error.status, headers });
+      return response({ message: error.message }, { status: error.status, headers });
     }
-    return NextResponse.json({ message: "The message could not be processed safely." }, { status: 500 });
+    return response({ message: "The message could not be processed safely." }, { status: 500 });
   }
 }

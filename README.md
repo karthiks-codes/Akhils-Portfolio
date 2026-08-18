@@ -25,7 +25,12 @@ No environment variable is required to browse or build the portfolio. Forms inte
 |---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | Public | Canonical production origin. Defaults to local development. |
 | `NEXT_PUBLIC_ASSET_BASE_URL` | Public | Optional CDN origin. Asset paths remain under `/assets/...`. |
+| `AUTH_SECRET` | Server | Auth.js token/cookie encryption secret; use at least 32 random characters. |
+| `AUTH_GOOGLE_ID` | Server | Google OAuth web client ID. |
+| `AUTH_GOOGLE_SECRET` | Server | Google OAuth web client secret. |
+| `ADMIN_EMAILS` | Server | Comma-separated Google accounts allowed into `/admin/insights`. |
 | `RESEND_API_KEY` | Server | Sends the owner notification and visitor acknowledgment. |
+| `RESEND_WEBHOOK_SECRET` | Server | Verifies signed Resend delivery events. |
 | `CONTACT_FROM_EMAIL` | Server | Verified Resend sender. |
 | `CONTACT_TO_EMAIL` | Server | Notification recipient. Defaults to Akhil's confirmed email. |
 | `MONGODB_URI` | Server | Optional Atlas persistence for dynamic submissions. |
@@ -72,7 +77,55 @@ The script preserves the `assets/` object keys and compares SHA-256 metadata, so
 - one-way HMAC hashing of the request address; raw IP addresses are not stored
 - safe provider errors with no leaked secrets
 
-Contact and suggestion email use the same Resend pipeline. When MongoDB is configured, records are stored in `contact_submissions` or `project_suggestions` with pending/sent/failed delivery state. No TTL is configured because a retention policy has not been selected.
+Contact and suggestion email use the same Resend pipeline. When MongoDB is configured, records are stored in `contact_submissions` or `project_suggestions` with pending, sent, delivered, delayed, or failed delivery state. No TTL is configured because a retention policy has not been selected.
+
+Each email is tagged with its submission ID, submission type and delivery channel. The signed Resend webhook at `POST /api/webhooks/resend` updates notification and acknowledgement state without storing a separate event collection. Subscribe it to `email.sent`, `email.delivered`, `email.delivery_delayed`, `email.failed`, `email.bounced`, `email.complained` and `email.suppressed`. Copy the endpoint signing secret—not the API key—into `RESEND_WEBHOOK_SECRET`.
+
+## Private insights and Google authentication
+
+The operational dashboard lives at `/admin/insights`. It is absent from the sitemap, disallowed in `robots.txt`, protected by Google OAuth and checked against `ADMIN_EMAILS` before any database query runs. It intentionally excludes message bodies, names, visitor email addresses, raw IP addresses and provider secrets.
+
+Create a Google Cloud OAuth client of type **Web application**, then configure:
+
+```text
+Authorized JavaScript origins
+http://localhost:3000
+https://www.akhilkarthik.tech
+
+Authorized redirect URIs
+http://localhost:3000/api/auth/callback/google
+https://www.akhilkarthik.tech/api/auth/callback/google
+```
+
+The redirect URI must exactly match the hostname used to start sign-in. Generate `AUTH_SECRET` with:
+
+```bash
+pnpm exec auth secret
+```
+
+Set the same authentication variables in Vercel Production. Preview deployments require their own Google callback strategy; do not add wildcard redirect URIs.
+
+## Observability
+
+The application includes:
+
+- Vercel Web Analytics and 50% sampled Speed Insights in the root layout
+- `GET /api/health` for minimal external liveness checks
+- JSON server logs with request IDs, safe stage names, outcomes and durations
+- Next.js instrumentation for uncaught server request errors
+- live MongoDB and canonical R2 object probes inside the authenticated dashboard
+- aggregated contact/suggestion volume and email delivery state
+- signed, timestamp-aware Resend webhook processing that ignores duplicate or older events
+
+Useful production monitors are the homepage, `/api/health`, and one permanent R2 object such as the canonical portrait. Vercel request/function detail remains in Vercel, R2 operation metrics remain in Cloudflare, and database metrics remain in Atlas; the admin page links to each console instead of duplicating provider telemetry.
+
+## Easter eggs and keyboard controls
+
+- `Ctrl+K` or `Cmd+K` opens the command palette; `whoami`, `stack`, and `status` reveal additional panels.
+- Pressing `B` three times outside a form toggles Blueprint Mode; `Escape` closes it.
+- Five quick selections of the `AK` home mark reveal the build note.
+- The footer build credit opens the hidden colophon.
+- On the 404 page, typing `home` or `projects` activates keyboard recovery.
 
 ## Quality checks
 
@@ -96,7 +149,10 @@ Recommended production layout:
 3. Add a Cloudflare Turnstile widget for the production hostname.
 4. Optionally create MongoDB Atlas storage and set `MONGODB_URI`.
 5. Optionally sync `public/assets/` to R2, expose it through a public/custom domain and set `NEXT_PUBLIC_ASSET_BASE_URL`.
-6. Run all quality checks in CI before promoting the deployment.
+6. Create the Google OAuth web client, set the Auth.js variables and verify `/admin/insights` with the allowlisted account.
+7. Register the production Resend webhook and store its signing secret.
+8. Enable Web Analytics and Speed Insights in the Vercel project dashboard.
+9. Run all quality checks in CI before promoting the deployment.
 
 This repository does not create or deploy provider resources automatically.
 

@@ -22,7 +22,10 @@ function adapters(overrides: Partial<SubmissionAdapters> = {}): SubmissionAdapte
     releaseDuplicate: vi.fn(),
     store: vi.fn().mockResolvedValue(undefined),
     updateStatus: vi.fn().mockResolvedValue(undefined),
-    deliver: vi.fn().mockResolvedValue(undefined),
+    deliver: vi.fn().mockResolvedValue({
+      notificationEmailId: "notification-email-id",
+      acknowledgementEmailId: "acknowledgement-email-id",
+    }),
     ...overrides,
   };
 }
@@ -35,7 +38,11 @@ describe("submission pipeline", () => {
     ).resolves.toEqual({ id: "submission-id" });
     expect(provider.store).toHaveBeenCalledWith(expect.objectContaining({ deliveryStatus: "pending", abuseIdentifier: "hashed-ip" }));
     expect(provider.deliver).toHaveBeenCalledOnce();
-    expect(provider.updateStatus).toHaveBeenLastCalledWith(expect.any(Object), "sent");
+    expect(provider.updateStatus).toHaveBeenLastCalledWith(
+      expect.any(Object),
+      "sent",
+      expect.objectContaining({ notificationEmailId: "notification-email-id" }),
+    );
   });
 
   it("releases duplicate reservation when captcha fails", async () => {

@@ -1,6 +1,7 @@
 import { ArrowUpRight, Mail, MapPin } from "lucide-react";
 import Link from "next/link";
 
+import { ColophonDialog } from "@/components/layout/colophon-dialog";
 import { site } from "@/content/site";
 import { BrandGithub, BrandLinkedIn } from "@/components/ui/brand-icons";
 
@@ -31,7 +32,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="section-shell flex flex-col gap-2 border-t border-white/[0.07] py-5 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
-        <span>Designed & engineered in Hyderabad</span>
+        <ColophonDialog />
         <span>© {new Date().getFullYear()} Akhil Karthik Boddupalli</span>
       </div>
     </footer>

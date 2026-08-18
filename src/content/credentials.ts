@@ -63,4 +63,5 @@ export const badges: Credential[] = [
     badgeImage: assets.credentials.mongodbSchemaBadge,
     proofFile: assets.credentials.mongodbSchemaProof,
   },
+
 ];

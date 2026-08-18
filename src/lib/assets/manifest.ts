@@ -20,6 +20,7 @@ const localAssets = {
       "/assets/credentials/badges/mongodb/mongodb-schema-design-patterns-and-anti-patterns-skill-badge.png",
     mongodbSchemaProof:
       "/assets/credentials/badges/mongodb/mongodb-schema-design-patterns-and-anti-patterns-skill-proof.pdf",
+
   },
 } as const;
 
