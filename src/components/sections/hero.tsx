@@ -97,10 +97,7 @@ export function Hero() {
             transition={{ duration: reduceMotion ? 0 : 36, repeat: reduceMotion ? 0 : Infinity, ease: "linear" }}
             className="absolute -right-7 -top-7 hidden size-24 rounded-full border border-dashed border-white/15 lg:block"
           />
-          <div className="absolute -left-6 bottom-16 hidden rounded-2xl border border-white/10 bg-[#0d1014]/90 px-4 py-3 shadow-xl backdrop-blur-xl sm:block">
-            <p className="font-mono text-[0.58rem] uppercase tracking-[0.15em] text-zinc-600">Current focus</p>
-            <p className="mt-1.5 text-xs text-zinc-300">AI × Product × Cloud</p>
-          </div>
+
         </motion.div>
       </div>
       <div aria-hidden="true" className="absolute bottom-0 left-1/2 h-px w-[min(90%,76rem)] -translate-x-1/2 bg-gradient-to-r from-transparent via-white/15 to-transparent" />
