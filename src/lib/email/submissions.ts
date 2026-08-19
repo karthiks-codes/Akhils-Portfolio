@@ -51,7 +51,7 @@ export async function deliverSubmission(
       to: [record.email],
       replyTo: [config.to],
       subject: isSuggestion ? `Your idea for ${record.projectName} was received` : "Thanks for reaching out",
-      text: "Thanks for reaching out. I've received your message and will get back to you soon.",
+      text: "Thanks for reaching out. I've received your message and will get back to you soon.\n Please do not reply to this email as it was generated from an email account that is not monitored.",
       tags: [
         { name: "submission_id", value: record._id },
         { name: "submission_type", value: record.type },

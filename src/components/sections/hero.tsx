@@ -97,7 +97,6 @@ export function Hero() {
             transition={{ duration: reduceMotion ? 0 : 36, repeat: reduceMotion ? 0 : Infinity, ease: "linear" }}
             className="absolute -right-7 -top-7 hidden size-24 rounded-full border border-dashed border-white/15 lg:block"
           />
-
         </motion.div>
       </div>
       <div aria-hidden="true" className="absolute bottom-0 left-1/2 h-px w-[min(90%,76rem)] -translate-x-1/2 bg-gradient-to-r from-transparent via-white/15 to-transparent" />
