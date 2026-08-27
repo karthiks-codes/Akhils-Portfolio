@@ -63,7 +63,7 @@ To sync canonical assets to an authorized R2 bucket:
 pnpm assets:sync
 ```
 
-The script preserves the `assets/` object keys and compares SHA-256 metadata, so repeated runs only upload changed files. It never deletes bucket objects.
+The script reads the four `R2_*` credentials from the environment, falling back to `.env.local` then `.env` when they are not already set. It preserves the `assets/` object keys and compares SHA-256 metadata, so repeated runs only upload changed files. It never deletes bucket objects.
 
 ## Forms and storage
 

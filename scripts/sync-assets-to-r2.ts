@@ -1,9 +1,16 @@
 import { createHash } from "node:crypto";
-import { readFile, readdir, stat } from "node:fs/promises";
-import { join, relative, sep } from "node:path";
+import { existsSync } from "node:fs";
+import { readFile, readdir } from "node:fs/promises";
+import { extname, join, relative, sep } from "node:path";
 
 import { HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { z } from "zod";
+
+// Real environment variables win; `.env.local` wins over `.env`.
+for (const file of [".env.local", ".env"]) {
+  const path = join(process.cwd(), file);
+  if (existsSync(path)) process.loadEnvFile(path);
+}
 
 const envSchema = z.object({
   R2_ACCOUNT_ID: z.string().min(1),
@@ -17,24 +24,43 @@ const contentTypes: Record<string, string> = {
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".webp": "image/webp",
+  ".avif": "image/avif",
+  ".gif": "image/gif",
   ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
   ".pdf": "application/pdf",
 };
 
 async function filesUnder(directory: string): Promise<string[]> {
-  const entries = await readdir(directory);
+  const entries = await readdir(directory, { withFileTypes: true });
   const files = await Promise.all(
     entries.map(async (entry) => {
-      const path = join(directory, entry);
-      return (await stat(path)).isDirectory() ? filesUnder(path) : [path];
+      const path = join(directory, entry.name);
+      return entry.isDirectory() ? filesUnder(path) : [path];
     }),
   );
   return files.flat();
 }
 
+function readEnv() {
+  const parsed = envSchema.safeParse(process.env);
+  if (parsed.success) return parsed.data;
+
+  const missing = parsed.error.issues.map((issue) => issue.path.join("."));
+  throw new Error(
+    `Missing R2 configuration: ${missing.join(", ")}. ` +
+      "Set these in .env.local (see .env.example) or in the environment before running assets:sync.",
+  );
+}
+
 async function main() {
-  const env = envSchema.parse(process.env);
+  const env = readEnv();
   const assetRoot = join(process.cwd(), "public", "assets");
+
+  if (!existsSync(assetRoot)) {
+    throw new Error(`Asset directory not found: ${assetRoot}`);
+  }
+
   const client = new S3Client({
     region: "auto",
     endpoint: `https://${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -58,7 +84,8 @@ async function main() {
       currentHash = head.Metadata?.sha256;
     } catch (error) {
       const status = (error as { $metadata?: { httpStatusCode?: number } }).$metadata?.httpStatusCode;
-      if (status !== 404) throw error;
+      const name = (error as { name?: string }).name;
+      if (status !== 404 && name !== "NotFound" && name !== "NoSuchKey") throw error;
     }
 
     if (currentHash === sha256) {
@@ -66,17 +93,17 @@ async function main() {
       continue;
     }
 
-    const extension = file.slice(file.lastIndexOf(".")).toLowerCase();
     await client.send(
       new PutObjectCommand({
         Bucket: env.R2_BUCKET_NAME,
         Key: key,
         Body: body,
-        ContentType: contentTypes[extension] ?? "application/octet-stream",
+        ContentType: contentTypes[extname(file).toLowerCase()] ?? "application/octet-stream",
         CacheControl: "public, max-age=31536000, immutable",
         Metadata: { sha256 },
       }),
     );
+    console.info(`uploaded ${key}`);
     uploaded += 1;
   }
 
