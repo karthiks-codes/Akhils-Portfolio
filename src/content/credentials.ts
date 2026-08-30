@@ -73,5 +73,15 @@ export const badges: Credential[] = [
     badgeImage: assets.credentials.mongodbSchemaBadge,
     proofFile: assets.credentials.mongodbSchemaProof,
   },
+  {
+    name: "MongoDB Indexing Design Fundamentals",
+    issuer: "MongoDB",
+    type: "badge",
+    category: "Database",
+    date: "August 30, 2026",
+    credentialUrl: "https://www.credly.com/badges/e495cbcb-f856-4fb9-b110-a9e0564cb57f/linked_in_profile",
+    badgeImage: assets.credentials.mongodbIndexingBadge,
+    proofFile: assets.credentials.mongodbIndexingProof,
+  },
 
 ];

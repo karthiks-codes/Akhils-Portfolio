@@ -24,6 +24,10 @@ const localAssets = {
       "/assets/credentials/badges/mongodb/mongodb-crud-operations-badge.png",
     mongodbCrudProof:
       "/assets/credentials/badges/mongodb/mongodb-crud-operations-proof.pdf",
+    mongodbIndexingBadge:
+      "/assets/credentials/badges/mongodb/mongodb-indexing-design-fundamentals-badge.png",
+    mongodbIndexingProof:
+      "/assets/credentials/badges/mongodb/mongodb-indexing-design-fundamentals-proof.pdf",
 
   },
 } as const;
