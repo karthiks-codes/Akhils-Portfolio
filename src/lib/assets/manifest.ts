@@ -29,9 +29,9 @@ const localAssets = {
     mongodbIndexingProof:
       "/assets/credentials/badges/mongodb/mongodb-indexing-design-fundamentals-proof.pdf",
     mongodbVectorSearchBadge:
-      "/assets/credentials/badges/mongodb/mongodb-building-ai-powered-search-with-mongodb-vector-search-badge.png",
+      "/assets/credentials/badges/mongodb/mongodb-vector-search-badge.png",
     mongodbVectorSearchProof:
-      "/assets/credentials/badges/mongodb/mongodb-building-ai-powered-search-with-mongodb-vector-search-proof.pdf",
+      "/assets/credentials/badges/mongodb/mongodb-vector-search-proof.pdf",
     
 
   },
