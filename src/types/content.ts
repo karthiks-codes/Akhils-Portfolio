@@ -1,11 +1,11 @@
 export const projectCategories = [
   "All",
-  "AI / ML",
   "Full Stack",
+  "Research",
+  "AI / ML",
   "Cloud & DevOps",
   "Automation",
   "Vibe Coding",
-  "Research",
 ] as const;
 
 export type ProjectCategory = Exclude<(typeof projectCategories)[number], "All">;
