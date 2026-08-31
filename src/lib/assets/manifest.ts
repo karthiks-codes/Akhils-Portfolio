@@ -28,6 +28,11 @@ const localAssets = {
       "/assets/credentials/badges/mongodb/mongodb-indexing-design-fundamentals-badge.png",
     mongodbIndexingProof:
       "/assets/credentials/badges/mongodb/mongodb-indexing-design-fundamentals-proof.pdf",
+    mongodbVectorSearchBadge:
+      "/assets/credentials/badges/mongodb/mongodb-building-ai-powered-search-with-mongodb-vector-search-badge.png",
+    mongodbVectorSearchProof:
+      "/assets/credentials/badges/mongodb/mongodb-building-ai-powered-search-with-mongodb-vector-search-proof.pdf",
+    
 
   },
 } as const;

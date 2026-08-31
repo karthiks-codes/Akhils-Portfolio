@@ -83,5 +83,15 @@ export const badges: Credential[] = [
     badgeImage: assets.credentials.mongodbIndexingBadge,
     proofFile: assets.credentials.mongodbIndexingProof,
   },
+  {
+    name: "Building AI-Powered Search with MongoDB Vector Search",
+    issuer: "MongoDB",
+    type: "badge",
+    category: "Database",
+    date: "August 31, 2026",
+    credentialUrl: "https://www.credly.com/badges/054c8e9d-7f2f-4b87-8848-19c9df7e123b/linked_in_profile",
+    badgeImage: assets.credentials.mongodbVectorSearchBadge,
+    proofFile: assets.credentials.mongodbVectorSearchProof,
+  },
 
 ];
