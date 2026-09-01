@@ -93,5 +93,15 @@ export const badges: Credential[] = [
     badgeImage: assets.credentials.mongodbVectorSearchBadge,
     proofFile: assets.credentials.mongodbVectorSearchProof,
   },
+  {
+    name: "Building RAG Apps Using MongoDB",
+    issuer: "MongoDB",
+    type: "badge",
+    category: "Database",
+    date: "September 1, 2026",
+    credentialUrl: "https://www.credly.com/badges/4363c3a9-222f-4edd-b6cb-8ee7f5635eaf/linked_in_profile",
+    badgeImage: assets.credentials.mongodbVectorSearchBadge,
+    proofFile: assets.credentials.mongodbVectorSearchProof,
+  },
 
 ];

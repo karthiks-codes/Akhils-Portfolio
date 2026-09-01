@@ -32,7 +32,10 @@ const localAssets = {
       "/assets/credentials/badges/mongodb/mongodb-vector-search-badge.png",
     mongodbVectorSearchProof:
       "/assets/credentials/badges/mongodb/mongodb-vector-search-proof.pdf",
-    
+    mongodbRagAppsBadge:
+      "/assets/credentials/badges/mongodb/mongodb-rag-badge.png",
+    mongodbRagAppsProof:
+      "/assets/credentials/badges/mongodb/mongodb-rag-proof.pdf",
 
   },
 } as const;
