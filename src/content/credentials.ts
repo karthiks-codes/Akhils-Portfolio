@@ -103,5 +103,12 @@ export const badges: Credential[] = [
     badgeImage: assets.credentials.mongodbVectorSearchBadge,
     proofFile: assets.credentials.mongodbVectorSearchProof,
   },
-
+  {
+    name: "The Basics of Google Cloud Compute Skill Badge",
+    issuer: "Google Cloud",
+    type: "badge",
+    category: "Cloud Computing",
+    credentialUrl: "https://www.credly.com/badges/ec3bc362-7d01-4c21-b4a8-e7798f9175db/public_url",
+    badgeImage: assets.credentials.googleCloudCompute,
+  },
 ];
