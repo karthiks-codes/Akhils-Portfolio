@@ -37,7 +37,7 @@ const localAssets = {
     mongodbRagAppsProof:
       "/assets/credentials/badges/mongodb/mongodb-rag-proof.pdf",
     googleCloudCompute:
-      "/assets/credentials/badges/google/google-the-basics-of-cloud-computing-with-google-cloud-badge.png",
+      "/assets/credentials/badges/google/google-the-basics-of-google-cloud-compute-skill-badge.png",
 
   },
 } as const;
