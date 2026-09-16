@@ -79,7 +79,7 @@ export function ContactForm({ compact = false }: { compact?: boolean }) {
         </label>
       </div>
       <input type="hidden" {...register("turnstileToken")} />
-      <TurnstileWidget onToken={setToken} resetNonce={resetNonce} />
+      <TurnstileWidget action="contact" onToken={setToken} resetNonce={resetNonce} />
       {errors.turnstileToken ? <p className="text-xs text-red-300">{errors.turnstileToken.message}</p> : null}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="max-w-md text-xs leading-5 text-zinc-600">

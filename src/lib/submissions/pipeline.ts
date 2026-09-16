@@ -28,7 +28,7 @@ export class SubmissionError extends Error {
 export type SubmissionAdapters = {
   now: () => Date;
   id: () => string;
-  verifyCaptcha: (token: string, remoteAddress: string) => Promise<boolean>;
+  verifyCaptcha: (token: string, action: string, remoteAddress: string) => Promise<boolean>;
   consumeLimit: (key: string) => { allowed: boolean; retryAfter: number };
   reserveDuplicate: (key: string) => boolean;
   releaseDuplicate: (key: string) => void;
@@ -44,12 +44,30 @@ export type SubmissionAdapters = {
 
 export function runtimeSubmissionAdapters(
   env: ServerEnv &
-    Required<Pick<ServerEnv, "RESEND_API_KEY" | "CONTACT_FROM_EMAIL" | "TURNSTILE_SECRET_KEY" | "SUBMISSION_HASH_SALT">>,
+    Required<
+      Pick<
+        ServerEnv,
+        "RESEND_API_KEY" | "CONTACT_FROM_EMAIL" | "TURNSTILE_SECRET_KEY" | "TURNSTILE_HOSTNAMES" | "SUBMISSION_HASH_SALT"
+      >
+    >,
 ): SubmissionAdapters {
+  const expectedHostnames = new Set(
+    env.TURNSTILE_HOSTNAMES.split(",")
+      .map((hostname) => hostname.trim().toLowerCase())
+      .filter(Boolean),
+  );
+
   return {
     now: () => new Date(),
     id: randomUUID,
-    verifyCaptcha: (token, remoteAddress) => verifyTurnstile(token, env.TURNSTILE_SECRET_KEY, remoteAddress),
+    verifyCaptcha: (token, action, remoteAddress) =>
+      verifyTurnstile(
+        token,
+        env.TURNSTILE_SECRET_KEY,
+        action,
+        expectedHostnames,
+        remoteAddress,
+      ),
     consumeLimit: (key) => consumeRateLimit(key),
     reserveDuplicate,
     releaseDuplicate,
@@ -105,7 +123,8 @@ export async function processSubmission(
   }
 
   const captchaStartedAt = Date.now();
-  if (!(await adapters.verifyCaptcha(input.turnstileToken, context.remoteAddress))) {
+  const action = type === "contact" ? "contact" : "project-suggestion";
+  if (!(await adapters.verifyCaptcha(input.turnstileToken, action, context.remoteAddress))) {
     adapters.releaseDuplicate(duplicateKey);
     telemetry("submission.captcha", { outcome: "failed", durationMs: Date.now() - captchaStartedAt });
     throw new SubmissionError("captcha", "Verification could not be completed. Please try again.", 400);

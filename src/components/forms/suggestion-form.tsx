@@ -72,7 +72,7 @@ export function SuggestionForm({ projectSlug, projectName }: { projectSlug: Sugg
           <label className="block text-sm text-zinc-300">Suggestion<textarea {...register("suggestion")} rows={5} className={`${fieldClass} resize-y`} placeholder="A useful feature, workflow or technical direction…" />{errors.suggestion ? <span className="mt-1 block text-xs text-red-300">{errors.suggestion.message}</span> : null}</label>
           <div className="sr-only" aria-hidden="true"><label>Website<input {...register("website")} tabIndex={-1} autoComplete="off" /></label></div>
           <input type="hidden" {...register("turnstileToken")} />
-          <TurnstileWidget onToken={setToken} resetNonce={resetNonce} />
+          <TurnstileWidget action="project-suggestion" onToken={setToken} resetNonce={resetNonce} />
           {errors.turnstileToken ? <p className="text-xs text-red-300">{errors.turnstileToken.message}</p> : null}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-sm text-xs leading-5 text-zinc-600">Your details are used only to respond and prevent abuse.</p>

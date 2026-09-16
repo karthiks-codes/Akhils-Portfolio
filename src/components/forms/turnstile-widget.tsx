@@ -12,7 +12,15 @@ declare global {
   }
 }
 
-export function TurnstileWidget({ onToken, resetNonce = 0 }: { onToken: (token: string) => void; resetNonce?: number }) {
+export function TurnstileWidget({
+  action,
+  onToken,
+  resetNonce = 0,
+}: {
+  action: string;
+  onToken: (token: string) => void;
+  resetNonce?: number;
+}) {
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   const container = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
@@ -32,6 +40,7 @@ export function TurnstileWidget({ onToken, resetNonce = 0 }: { onToken: (token: 
       if (window.turnstile) {
         widgetId = window.turnstile.render(container.current, {
           sitekey: siteKey,
+          action,
           theme: "dark",
           size: "flexible",
           callback: (token: string) => {
@@ -64,7 +73,7 @@ export function TurnstileWidget({ onToken, resetNonce = 0 }: { onToken: (token: 
       cancelled = true;
       if (widgetId && window.turnstile) window.turnstile.remove(widgetId);
     };
-  }, [onToken, resetNonce, siteKey]);
+  }, [action, onToken, resetNonce, siteKey]);
 
   if (!siteKey) {
     return (

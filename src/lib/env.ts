@@ -22,6 +22,7 @@ const serverEnvSchema = z
     MONGODB_URI: optionalString,
     MONGODB_DB_NAME: z.string().min(1).default("akhil_portfolio"),
     TURNSTILE_SECRET_KEY: optionalString,
+    TURNSTILE_HOSTNAMES: optionalString,
     SUBMISSION_HASH_SALT: optionalString,
     R2_ACCOUNT_ID: optionalString,
     R2_ACCESS_KEY_ID: optionalString,
@@ -46,7 +47,16 @@ export function readServerEnv() {
 }
 
 export function getSubmissionConfig():
-  | { ok: true; env: ServerEnv & Required<Pick<ServerEnv, "RESEND_API_KEY" | "CONTACT_FROM_EMAIL" | "TURNSTILE_SECRET_KEY" | "SUBMISSION_HASH_SALT">> }
+  | {
+      ok: true;
+      env: ServerEnv &
+        Required<
+          Pick<
+            ServerEnv,
+            "RESEND_API_KEY" | "CONTACT_FROM_EMAIL" | "TURNSTILE_SECRET_KEY" | "TURNSTILE_HOSTNAMES" | "SUBMISSION_HASH_SALT"
+          >
+        >;
+    }
   | { ok: false; message: string } {
   const parsed = readServerEnv();
 
@@ -61,7 +71,7 @@ export function getSubmissionConfig():
     parsed.data.SUBMISSION_HASH_SALT,
   ];
 
-  if (required.some((value) => !value)) {
+  if (required.some((value) => !value) || !parsed.data.TURNSTILE_HOSTNAMES) {
     return {
       ok: false,
       message: "Messaging is not active in this environment yet. Please use the email link instead.",
@@ -72,7 +82,10 @@ export function getSubmissionConfig():
     ok: true,
     env: parsed.data as ServerEnv &
       Required<
-        Pick<ServerEnv, "RESEND_API_KEY" | "CONTACT_FROM_EMAIL" | "TURNSTILE_SECRET_KEY" | "SUBMISSION_HASH_SALT">
+        Pick<
+          ServerEnv,
+          "RESEND_API_KEY" | "CONTACT_FROM_EMAIL" | "TURNSTILE_SECRET_KEY" | "TURNSTILE_HOSTNAMES" | "SUBMISSION_HASH_SALT"
+        >
       >,
   };
 }
