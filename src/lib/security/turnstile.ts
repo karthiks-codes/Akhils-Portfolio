@@ -1,9 +1,12 @@
 import { z } from "zod";
 
+import { logger } from "@/lib/observability/logger";
+
 const turnstileResponseSchema = z.object({
   success: z.boolean(),
   action: z.string().optional(),
   hostname: z.string().optional(),
+  "error-codes": z.array(z.string()).optional(),
 });
 
 export async function verifyTurnstile(
@@ -24,15 +27,32 @@ export async function verifyTurnstile(
       body,
       signal: AbortSignal.timeout(8_000),
     });
-    if (!response.ok) return false;
+    if (!response.ok) {
+      logger.warn("submission.turnstile_http_error", { status: response.status });
+      return false;
+    }
     const result = turnstileResponseSchema.parse(await response.json());
-    return Boolean(
+    const valid = Boolean(
       result.success &&
         result.action === expectedAction &&
         result.hostname &&
         expectedHostnames.has(result.hostname.toLowerCase()),
     );
-  } catch {
+    if (!valid) {
+      logger.warn("submission.turnstile_rejected", {
+        success: result.success,
+        action: result.action,
+        hostname: result.hostname,
+        expectedAction,
+        hostnameAllowed: Boolean(result.hostname && expectedHostnames.has(result.hostname.toLowerCase())),
+        errorCodes: result["error-codes"]?.join(","),
+      });
+    }
+    return valid;
+  } catch (error) {
+    logger.warn("submission.turnstile_unavailable", {
+      errorType: error instanceof Error ? error.name : "UnknownError",
+    });
     return false;
   }
 }

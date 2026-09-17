@@ -28,7 +28,7 @@ export function CredentialPreview() {
           <Reveal delay={0.05} className="surface overflow-hidden rounded-[1.7rem] p-5 sm:p-7">
             <div className="flex items-center justify-between border-b border-white/10 pb-5"><div className="flex items-center gap-3"><BadgeCheck aria-hidden="true" className="text-accent" size={19} /><h3 className="font-mono text-xs uppercase tracking-[0.16em]">Digital Badges</h3></div><span className="text-xs text-zinc-600">Verified</span></div>
             <div className="mt-6 grid grid-cols-2 gap-3">
-              {badges.map((badge) => (
+              {badges.slice(0, 4).map((badge) => (
                 <a key={badge.name} href={badge.credentialUrl} target="_blank" rel="noreferrer" aria-label={`Verify ${badge.name}`} className="group rounded-2xl border border-white/[0.08] bg-black/15 p-3 transition-colors hover:border-white/20">
                   <div className="relative mx-auto aspect-square w-full max-w-[8rem]"><Image src={badge.badgeImage!} alt={`${badge.name} digital badge`} fill unoptimized={badge.badgeImage!.startsWith("http")} sizes="8rem" className="object-contain transition-transform duration-300 group-hover:scale-[1.03]" /></div>
                   <p className="mt-3 line-clamp-2 text-xs leading-5 text-zinc-400 group-hover:text-white">{badge.name}</p>
